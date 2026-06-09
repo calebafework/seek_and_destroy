@@ -1,0 +1,15 @@
+{
+  "name": "vulnlab",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "services/orchestrator",
+    "services/worker",
+    "packages/shared"
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "docker compose up --build",
+    "down": "docker compose down -v"
+  }
+}
