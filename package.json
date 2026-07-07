@@ -5,7 +5,7 @@
   "workspaces": [
     "services/orchestrator",
     "services/worker",
-    "packages/shared"
+    "packages/shared",
     "frontend"
   ],
   "scripts": {
