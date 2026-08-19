@@ -24,4 +24,3 @@ export type ScenarioCategory =
   | 'kubernetes'
   | 'cloud-infrastructure'
   | 'application'
-
