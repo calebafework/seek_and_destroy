@@ -37,7 +37,7 @@ export async function getLabById(LabId: string): Promise<ILab | null> {
     return Lab.findById(LabId)
 }
 
-export async function transtionLab(
+export async function transitionLab(
     labId: string,
     to: LabStatus
 ): Promise<ILab | null> {
