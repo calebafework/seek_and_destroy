@@ -14,7 +14,8 @@
     "winston": "^3.11.0",
     "uuid": "^9.0.0",
     "@vulnlab/shared": "*",
-    "dockerode": "^4.0.0"
+    "dockerode": "^4.0.0",
+    "zod": "^3.22.0"
   },
   "devDependencies": {
     "@types/dockerode": "^3.3.0",

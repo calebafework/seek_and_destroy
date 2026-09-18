@@ -18,38 +18,48 @@ export async function handleDeploy(message: JobMessage): Promise<void> {
 
     try {
     // create docker client
-    const docker = new Dockerode({ socketPath: '/var/run/docker.sock' })
+    const docker = new Dockerode({ host: 'host.docker.internal', port: 2375 })
 
     //scenario
-    const image = 'ghcr.io/webgoat/webgoat:latest'
+    const image = 'vulnerables/web-dvwa:latest'
     const containerName = `lab-${message.labId}`
     const networkName = `network-${message.labId}`
 
+    logger.info({ labId: message.labId, msg: 'Creating network' })
     const network = await docker.createNetwork({
         Name: networkName,
         Driver: 'bridge'
     })
 
-    await docker.pull(image)
+    logger.info({ labId: message.labId, msg: 'Pulling image' })
+    await new Promise<void>((resolve, reject) => {
+        docker.pull(image, (err: Error | null, stream: NodeJS.ReadableStream) => {
+            if (err) return reject(err)
+            docker.modem.followProgress(stream, (err: Error | null) => {
+                if (err) return reject(err)
+                resolve()
+            })
+        })
+    })
 
+    logger.info({ labId: message.labId, msg: 'Creating container' })
     const container = await docker.createContainer({
         Image: image,
         name: containerName,
-        ExposedPorts: { '8080/tcp': {} },
+        ExposedPorts: { '80/tcp': {} },
         HostConfig: {
             NetworkMode: networkName,
             PortBindings: {
-                '8080/tcp': [{ HostPort: '0' }]
+                '80/tcp': [{ HostPort: '0' }]
             }
         }
     })
     
+    logger.info({ labId: message.labId, msg: 'Starting container' })
     await container.start()
 
-    logger.info({ labId: message.labId, containerName, msg: 'Container started' })
-
     const containerInfo = await container.inspect()
-    const assignedPort = containerInfo.NetworkSettings.Ports['8080/tcp'][0].HostPort
+    const assignedPort = containerInfo.NetworkSettings.Ports['80/tcp'][0].HostPort
 
     const accessUrl = `http://localhost:${assignedPort}`
 
